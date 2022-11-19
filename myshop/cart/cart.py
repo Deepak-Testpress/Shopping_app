@@ -31,7 +31,7 @@ class Cart(object):
     def change_product_quantity(self, product, quantity):
         product_id = str(product.id)
         if product_id in self.cart:
-            self.cart[product_id]["quantity"] += quantity
+            self.cart[product_id]["quantity"] = quantity
         else:
             self.add_product(product, quantity=quantity)
             self.save()
