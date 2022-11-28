@@ -1,5 +1,4 @@
 from django.test import TestCase, RequestFactory
-from tests.shop.test_modelmixintestcase import ModelMixinTestCase
 from cart.cart import Cart
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -90,7 +89,7 @@ class Testurls(TestCase):
 
         self.assertEqual(new_quantity, cart[self.product_id_str]["quantity"])
 
-    def test_change_product_quantity_adds_product_to_cart_with_given_quantity_when_product_not_already_exists_in_cart(
+    def test_change_product_quantity_adds_product_to_cart_with_quantity_when_product_not_already_exists_in_cart(
         self,
     ):
         new_quantity = 14
