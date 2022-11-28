@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .test_modelmixintestcase import ModelMixinTestCase
+from tests.shop.test_model_mixin_testcase import ModelMixinTestCase
 
 
 class TestModelMethods(ModelMixinTestCase, TestCase):
