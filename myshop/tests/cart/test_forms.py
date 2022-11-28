@@ -3,7 +3,7 @@ from cart.forms import CartAddProductForm
 
 
 class TestForms(TestCase):
-    def test_cart_add_product_validates_true_with_quantity_not_exceeding_choice_range(
+    def test_adding_product_with_available_quantity_succeeds(
         self,
     ):
         form = CartAddProductForm(
@@ -14,7 +14,7 @@ class TestForms(TestCase):
 
         self.assertTrue(form.is_valid())
 
-    def test_cart_add_product_validates_false_with_quantity_exceeding_choice_range(
+    def test_adding_product_with_unavailable_quantity_fails(
         self,
     ):
         form = CartAddProductForm(
@@ -25,7 +25,7 @@ class TestForms(TestCase):
 
         self.assertFalse(form.is_valid())
 
-    def test_cart_add_product_validates_false_with_quantity_undervalue_choice_range(
+    def test_adding_product_with_invalid_quantity_fails(
         self,
     ):
         form = CartAddProductForm(
@@ -36,7 +36,7 @@ class TestForms(TestCase):
 
         self.assertFalse(form.is_valid())
 
-    def test_cart_add_product_validates_false_with_quantity_non_integer_choice_value(
+    def test_adding_product_to_cart_fails_for_non_integer_quantity(
         self,
     ):
         form = CartAddProductForm(
