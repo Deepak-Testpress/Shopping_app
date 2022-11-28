@@ -44,7 +44,7 @@ class Testurls(TestCase):
             str(self.product.price), cart[self.product_id_str]["price"]
         )
 
-    def test_add_new_product_to_the_cart_without_quantity_arg_sets_default_quantity(
+    def test_add_new_product_to_the_cart_without_quantity_sets_default_quantity(
         self,
     ):
         self.cart_obj.add_product(self.product)
