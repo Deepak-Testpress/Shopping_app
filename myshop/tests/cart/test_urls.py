@@ -5,11 +5,9 @@ from cart.views import cart_add, cart_detail
 
 class TestURLs(SimpleTestCase):
     def test_cart_add(self):
-        self.cart_add_url = reverse(
-            "cart:cart_add", kwargs={"product_id": "1"}
-        )
-        self.assertEqual((resolve(self.cart_add_url).func), cart_add)
+        cart_add_url = reverse("cart:cart_add", kwargs={"product_id": "1"})
+        self.assertEqual((resolve(cart_add_url).func), cart_add)
 
     def test_cart_detail(self):
-        self.cart_detail_url = reverse("cart:cart_detail")
-        self.assertEqual((resolve(self.cart_detail_url).func), cart_detail)
+        cart_detail_url = reverse("cart:cart_detail")
+        self.assertEqual((resolve(cart_detail_url).func), cart_detail)

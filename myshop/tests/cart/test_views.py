@@ -18,17 +18,15 @@ class TestViews(TestCase):
         )
 
     def test_cart_add_redirects_to_cart_detail(self):
-        self.cart_add_url = reverse(
-            "cart:cart_add", kwargs={"product_id": "1"}
-        )
-        self.cart_detail_url = reverse("cart:cart_detail")
-        response = self.client.post(self.cart_add_url)
+        cart_add_url = reverse("cart:cart_add", kwargs={"product_id": "1"})
+        cart_detail_url = reverse("cart:cart_detail")
+        response = self.client.post(cart_add_url)
 
-        self.assertEqual(self.cart_detail_url, response.url)
+        self.assertEqual(cart_detail_url, response.url)
 
     def test_templates_used_for_cart_detail_view(self):
-        self.cart_detail_url = reverse("cart:cart_detail")
-        response = self.client.get(self.cart_detail_url)
+        cart_detail_url = reverse("cart:cart_detail")
+        response = self.client.get(cart_detail_url)
 
         self.assertTemplateUsed(response, "cart/detail.html")
 
