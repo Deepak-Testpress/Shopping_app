@@ -31,3 +31,8 @@ class TestViews(TestCase):
         response = self.client.get(self.cart_detail_url)
 
         self.assertTemplateUsed(response, "cart/detail.html")
+
+    def test_cart_add_returns_404_for_invalid_product(self):
+        response = self.client.post(reverse("cart:cart_add", args=["2191"]))
+
+        self.assertEquals(response.status_code, 404)
