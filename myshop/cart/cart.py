@@ -34,7 +34,7 @@ class Cart(object):
             self.cart[product_id]["quantity"] = quantity
         else:
             self.add_product(product, quantity=quantity)
-            self.save()
+        self.save()
 
     def remove_product(self, product):
         product_id = str(product.id)
