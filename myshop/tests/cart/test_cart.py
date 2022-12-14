@@ -3,6 +3,10 @@ from cart.cart import Cart
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from shop.models import Product, Category
+from coupons.models import Coupon
+from django.utils import timezone
+from datetime import timedelta
+from coupons.views import coupon_apply
 
 
 class Testurls(TestCase):
@@ -28,6 +32,22 @@ class Testurls(TestCase):
         )
 
         self.product_id_str = str(self.product.id)
+
+        self.valid_coupon_for_10_percent = Coupon.objects.create(
+            code="FUNTEN",
+            valid_from=timezone.now() - timedelta(30),
+            valid_to=timezone.now() + timedelta(30),
+            discount=10,
+            active=True,
+        )
+
+        self.expired_coupon_for_50_percent = Coupon.objects.create(
+            code="GREAT50",
+            valid_from=timezone.now() - timedelta(30),
+            valid_to=timezone.now() - timedelta(20),
+            discount=50,
+            active=True,
+        )
 
     def test_initialize_cart_clean_session(self):
         empty_cart = {}
@@ -127,3 +147,67 @@ class Testurls(TestCase):
     def test_clear_deletes_session_thus_returns_none(self):
         self.cart_obj.clear()
         self.assertIsNone(self.request.session.get(settings.CART_SESSION_ID))
+
+    def test_coupon_returns_coupon_object_if_exist(self):
+        self.request.method = "POST"
+        self.request.POST = {"code": self.valid_coupon_for_10_percent.code}
+        coupon_apply(self.request)
+        self.cart_obj.coupon_id = self.request.session.get("coupon_id")
+
+        self.assertIsInstance(self.cart_obj.coupon, Coupon)
+
+    def test_coupon_returns_coupon_object_if_doesnot_exist(self):
+        self.request.method = "POST"
+        self.request.POST = {"code": self.expired_coupon_for_50_percent.code}
+        coupon_apply(self.request)
+        self.cart_obj.coupon_id = self.request.session.get("coupon_id")
+
+        self.assertIsNone(self.cart_obj.coupon)
+
+    def test_get_discount_returns_discount_price(self):
+        self.request.method = "POST"
+        self.request.POST = {"code": self.valid_coupon_for_10_percent.code}
+        coupon_apply(self.request)
+
+        quantity = 2
+        self.cart_obj.add_product(self.product, quantity=quantity)
+        self.cart_obj.coupon_id = self.request.session.get("coupon_id")
+
+        total_price = self.product.price * quantity
+        discount_price = total_price * (
+            self.valid_coupon_for_10_percent.discount / 100
+        )
+
+        self.assertEqual(discount_price, self.cart_obj.get_discount())
+
+    def test_get_discount_returns_zero_discount_price_when_coupon_invalid(
+        self,
+    ):
+        self.request.method = "POST"
+        self.request.POST = {"code": self.expired_coupon_for_50_percent.code}
+        coupon_apply(self.request)
+
+        self.cart_obj.add_product(self.product, quantity=2)
+        self.cart_obj.coupon_id = self.request.session.get("coupon_id")
+
+        self.assertEqual(0, self.cart_obj.get_discount())
+
+    def test_get_total_price_after_discount(self):
+        self.request.method = "POST"
+        self.request.POST = {"code": self.valid_coupon_for_10_percent.code}
+        coupon_apply(self.request)
+
+        quantity = 2
+        self.cart_obj.add_product(self.product, quantity=quantity)
+        self.cart_obj.coupon_id = self.request.session.get("coupon_id")
+
+        total_price = self.product.price * quantity
+        discount_price = total_price * (
+            self.valid_coupon_for_10_percent.discount / 100
+        )
+        calucated_discount_price = total_price - discount_price
+
+        self.assertEqual(
+            calucated_discount_price,
+            self.cart_obj.get_total_price_after_discount(),
+        )
