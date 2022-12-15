@@ -1,6 +1,5 @@
 from shop.models import Product, Category
 from django.test import TestCase, RequestFactory
-from cart.cart import Cart
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils import timezone
 from datetime import timedelta
@@ -9,13 +8,6 @@ from coupons.models import Coupon
 
 class ModelMixinTestCase(TestCase):
     def setUp(self):
-        self.request = RequestFactory().get("/")
-        middleware = SessionMiddleware(get_response=self.request)
-        middleware.process_request(self.request)
-        self.request.session.save()
-
-        self.cart = Cart(self.request)
-
         self.category = Category.objects.create(
             name="Gaming",
             slug="gaming",
@@ -50,3 +42,13 @@ class ModelMixinTestCase(TestCase):
             discount=50,
             active=True,
         )
+
+    def get_request(self, method, data):
+        request = RequestFactory().get("/")
+        middleware = SessionMiddleware(get_response=request)
+        middleware.process_request(request)
+        request.session.save()
+        request.method = method
+        request.POST = data
+
+        return request
